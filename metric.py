@@ -4,13 +4,27 @@ from scipy.interpolate import interp1d
 
 
 class Metric:
+    """
+    Attributes
+    ----------
+    x, y : array
+        meshgrid of x, y coordinates of a mesh
+
+    Methods
+    -------
+    compute()
+        compute the grid metrics
+    """
 
     def __init__(self, x, y):
         self.x = x
         self.y = y
         self.compute()
 
-    def boundary(self):
+    def _boundary(self):
+        """
+        private function to compute the boundary stencil
+        """
         x = self.x
         y = self.y
 
@@ -34,7 +48,10 @@ class Metric:
 
         return (x_s, y_s, x_t, y_t)
 
-    def interp_diff(self, axis):
+    def _interp_diff(self, axis):
+        """
+        private function to interpolate
+        """
         # TODO: no reason this cant be a vector function
 
         x = self.x
@@ -90,6 +107,10 @@ class Metric:
             return YHx_s, YHy_s
 
     def compute(self):
+        """
+        Compute the grid metrics
+        """
+
         x = self.x
         y = self.y
 
@@ -98,10 +119,10 @@ class Metric:
         YHx_t = x[1:, 1:-1] - x[:-1, 1:-1]
         YHy_t = y[1:, 1:-1] - y[:-1, 1:-1]
 
-        XHx_t, XHy_t = self.interp_diff(axis=0)
-        YHx_s, YHy_s = self.interp_diff(axis=1)
+        XHx_t, XHy_t = self._interp_diff(axis=0)
+        YHx_s, YHy_s = self._interp_diff(axis=1)
 
-        (Cx_s, Cy_s, Cx_t, Cy_t) = self.boundary()
+        (Cx_s, Cy_s, Cx_t, Cy_t) = self._boundary()
 
         Cx_t[1:-1, :] = (x[2:, :] - x[:-2, :]) * .5
         Cy_t[1:-1, :] = (y[2:, :] - y[:-2, :]) * .5
