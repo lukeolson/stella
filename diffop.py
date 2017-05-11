@@ -2,6 +2,7 @@ import numpy as np
 import scipy as sp
 import scipy.sparse
 
+
 class StencilArray(object):
 
     def __init__(self):
@@ -10,6 +11,7 @@ class StencilArray(object):
     @property
     def C(self):
         return self.vals[0]
+
     @C.setter
     def C(self, val):
         self.vals[0] = val
@@ -17,6 +19,7 @@ class StencilArray(object):
     @property
     def N(self):
         return self.vals[1]
+
     @N.setter
     def N(self, val):
         self.vals[1] = val
@@ -24,6 +27,7 @@ class StencilArray(object):
     @property
     def S(self):
         return self.vals[2]
+
     @S.setter
     def S(self, val):
         self.vals[2] = val
@@ -31,6 +35,7 @@ class StencilArray(object):
     @property
     def E(self):
         return self.vals[3]
+
     @E.setter
     def E(self, val):
         self.vals[3] = val
@@ -38,6 +43,7 @@ class StencilArray(object):
     @property
     def W(self):
         return self.vals[4]
+
     @W.setter
     def W(self, val):
         self.vals[4] = val
@@ -45,6 +51,7 @@ class StencilArray(object):
     @property
     def NE(self):
         return self.vals[5]
+
     @NE.setter
     def NE(self, val):
         self.vals[5] = val
@@ -52,6 +59,7 @@ class StencilArray(object):
     @property
     def NW(self):
         return self.vals[6]
+
     @NW.setter
     def NW(self, val):
         self.vals[6] = val
@@ -59,6 +67,7 @@ class StencilArray(object):
     @property
     def SE(self):
         return self.vals[7]
+
     @SE.setter
     def SE(self, val):
         self.vals[7] = val
@@ -66,6 +75,7 @@ class StencilArray(object):
     @property
     def SW(self):
         return self.vals[8]
+
     @SW.setter
     def SW(self, val):
         self.vals[8] = val
@@ -80,7 +90,6 @@ class DiffOp:
         self.nx = nx
         self.ny = ny
         self.a = None
-
 
     def insert(self, i, j, stencil_array):
         nx = self.nx
@@ -129,7 +138,6 @@ class DiffOp:
                 self.jv.append(j*nx + i - 1)
                 self.dv.append(sta.W)
 
-
     def assemble(self):
         a = sp.sparse.coo_matrix((self.dv, (self.iv, self.jv)),
                                  shape=(self.nx*self.ny, self.nx*self.ny))
@@ -148,22 +156,22 @@ def create_op(met, eps):
         for i in range(nx - 2):
             ii = i+1
             sta = StencilArray()
-            sta.N = met.yhJ[j+1,i] * met.g22[j+1,i]
-            sta.S = met.yhJ[j,i] * met.g22[j,i]
-            sta.E = met.xhJ[j,i+1] * met.g11[j,i+1]
-            sta.W = met.xhJ[j,i] * met.g11[j,i]
-            sta.NE = .25 * ((met.cJ[jj,ii+1] * met.g12[jj,ii+1]) +
-                            (met.cJ[jj+1,ii] * met.g21[jj+1,ii]))
-            sta.SE = .25 * ((-1 * met.cJ[jj,ii+1] * met.g12[jj,ii+1]) +
-                            (-1 * met.cJ[jj-1,ii] * met.g21[jj-1,ii]))
-            sta.NW = .25 * ((-1 * met.cJ[jj,ii-1] * met.g12[jj,ii-1]) +
-                            (-1 * met.cJ[jj+1,ii] * met.g21[jj+1,ii]))
-            sta.SW = .25 * ((met.cJ[jj,ii-1] * met.g12[jj,ii-1]) +
-                            (met.cJ[jj-1,ii] * met.g21[jj-1,ii]))
-            sta.C = ((-1. * met.xhJ[j,i+1] * met.g11[j,i+1]) +
-                     (-1. * met.xhJ[j,i] * met.g11[j,i]) +
-                     (-1. * met.yhJ[j+1,i] * met.g22[j+1,i]) +
-                     (-1. * met.yhJ[j,i] * met.g22[j,i]))
+            sta.N = met.yhJ[j+1, i] * met.g22[j+1, i]
+            sta.S = met.yhJ[j, i] * met.g22[j, i]
+            sta.E = met.xhJ[j, i+1] * met.g11[j, i+1]
+            sta.W = met.xhJ[j, i] * met.g11[j, i]
+            sta.NE = .25 * ((met.cJ[jj, ii+1] * met.g12[jj, ii+1]) +
+                            (met.cJ[jj+1, ii] * met.g21[jj+1, ii]))
+            sta.SE = .25 * ((-1 * met.cJ[jj, ii+1] * met.g12[jj, ii+1]) +
+                            (-1 * met.cJ[jj-1, ii] * met.g21[jj-1, ii]))
+            sta.NW = .25 * ((-1 * met.cJ[jj, ii-1] * met.g12[jj, ii-1]) +
+                            (-1 * met.cJ[jj+1, ii] * met.g21[jj+1, ii]))
+            sta.SW = .25 * ((met.cJ[jj, ii-1] * met.g12[jj, ii-1]) +
+                            (met.cJ[jj-1, ii] * met.g21[jj-1, ii]))
+            sta.C = ((-1. * met.xhJ[j, i+1] * met.g11[j, i+1]) +
+                     (-1. * met.xhJ[j, i] * met.g11[j, i]) +
+                     (-1. * met.yhJ[j+1, i] * met.g22[j+1, i]) +
+                     (-1. * met.yhJ[j, i] * met.g22[j, i]))
 
             sta.vals = -1*sta.vals
 
