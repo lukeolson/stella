@@ -4,7 +4,7 @@ import scipy.sparse
 import matplotlib.pyplot as plt
 from scipy.sparse.linalg import cg
 import pyamg
-from diffop import create_op
+from diffop import create_op, DiffOp, StencilArray
 from metric import Metric
 import matplotlib.gridspec as gridspec
 from mpl_toolkits.mplot3d.axes3d import Axes3D

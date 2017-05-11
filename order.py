@@ -83,5 +83,5 @@ def plot():
 
 
 if __name__ == '__main__':
-    # order()
+    order()
     plot()
