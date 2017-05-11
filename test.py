@@ -13,7 +13,7 @@ from mpl_toolkits.mplot3d.axes3d import Axes3D
 class MyAxes3D(Axes3D):
     def __init__(self, baseObject, sides_to_draw):
         self.__class__ = type(baseObject.__class__.__name__,
-                              (self.__class__, baseObject.__class__),{})
+                              (self.__class__, baseObject.__class__), {})
         self.__dict__ = baseObject.__dict__
         self.sides_to_draw = list(sides_to_draw)
         self.mouse_init()
@@ -42,13 +42,13 @@ class MyAxes3D(Axes3D):
 
         tmp_planes = zaxis._PLANES
 
-        if 'l' in self.sides_to_draw :
+        if 'l' in self.sides_to_draw:
             # draw zaxis on the left side
             zaxis._PLANES = (tmp_planes[2], tmp_planes[3],
                              tmp_planes[0], tmp_planes[1],
                              tmp_planes[4], tmp_planes[5])
             zaxis.draw(renderer)
-        if 'r' in self.sides_to_draw :
+        if 'r' in self.sides_to_draw:
             # draw zaxis on the right side
             zaxis._PLANES = (tmp_planes[3], tmp_planes[2],
                              tmp_planes[1], tmp_planes[0],
@@ -64,39 +64,48 @@ class MyAxes3D(Axes3D):
 def map_curl_x(x, y):
     return -1*y + 1
 
+
 def map_curl_y(x, y):
     return x
+
 
 def map_second_x(x, y):
     return 10*x
 
+
 def map_second_y(x, y):
     return y
+
 
 def map_distort_x(x, y):
     eps = .01
     return x + eps*np.sin(2*np.pi*x)*np.sin(2*np.pi*y)
 
+
 def map_distort_y(x, y):
     eps = .01
     return y + eps*np.sin(2*np.pi*x)*np.sin(2*np.pi*y)
 
+
 def rhs(x, y):
     return 8*(np.pi*np.pi)*np.sin(2*np.pi*x)*np.sin(2*np.pi*y)
+
 
 def sol(x, y):
     return np.sin(2*np.pi*x)*np.sin(2*np.pi*y)
 
+
 def jump_rhs(x, y):
     ret = np.zeros(x.shape)
-    ret[x<=0] = -16
-    ret[x>0] = 16
+    ret[x <= 0] = -16
+    ret[x > 0] = 16
     return ret
+
 
 def jump_sol(x, y):
     ret = np.zeros(x.shape)
-    ret[x <=0] = 2*(x[x<=0]**2) + 2*x[x<=0]
-    ret[x > 0] = -4*(x[x>0]**2) + 4*x[x>0]
+    ret[x <= 0] = 2*(x[x <= 0]**2) + 2*x[x <= 0]
+    ret[x > 0] = -4*(x[x > 0]**2) + 4*x[x > 0]
     return ret
 
 
@@ -116,7 +125,7 @@ eps = np.ones((ny-1, nx-1))
 
 op = create_op(met, eps)
 
-f = met.cJ[1:-1,1:-1] * rhs(xv[1:-1,1:-1], yv[1:-1,1:-1])
+f = met.cJ[1:-1, 1:-1] * rhs(xv[1:-1, 1:-1], yv[1:-1, 1:-1])
 b = f.ravel()
 # ml = pyamg.ruge_stuben_solver(op.a,
 #                               max_levels=10,
@@ -132,9 +141,9 @@ ml = pyamg.smoothed_aggregation_solver(op.a,
 M = ml.aspreconditioner(cycle='V')
 res = []
 x, info = pyamg.krylov.cg(op.a, b, maxiter=200, M=M, residuals=res)
-#x = ml.solve(b, tol=1e-8, maxiter=200, residuals=res)
+# x = ml.solve(b, tol=1e-8, maxiter=200, residuals=res)
 x = x.reshape(f.shape)
-xex = sol(xv[1:-1,1:-1], yv[1:-1,1:-1])
+xex = sol(xv[1:-1, 1:-1], yv[1:-1, 1:-1])
 
 diff = xex - x
 print 'Max Norm:', np.max(np.abs(diff))
@@ -159,4 +168,4 @@ print 'Residuals to converge:', len(res)
 # plt.show()
 plt.spy(op.a - op.a.T)
 plt.show()
-#np.savetxt('nested.txt', res)
+# np.savetxt('nested.txt', res)
