@@ -146,8 +146,8 @@ x = x.reshape(f.shape)
 xex = sol(xv[1:-1, 1:-1], yv[1:-1, 1:-1])
 
 diff = xex - x
-print 'Max Norm:', np.max(np.abs(diff))
-print 'Residuals to converge:', len(res)
+print('Max Norm:', np.max(np.abs(diff)))
+print('Residuals to converge:', len(res))
 # plt.pcolormesh(xv)
 # plt.show()
 # plt.pcolormesh(yv)
