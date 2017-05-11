@@ -1,0 +1,3 @@
+# stella
+
+Structured elliptic operators
