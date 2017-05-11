@@ -123,16 +123,16 @@ xv = xtmp
 met = Metric(xv, yv)
 eps = np.ones((ny-1, nx-1))
 
-op = create_op(met, eps)
+op = create_op(met)
 
 f = met.cJ[1:-1, 1:-1] * rhs(xv[1:-1, 1:-1], yv[1:-1, 1:-1])
 b = f.ravel()
-# ml = pyamg.ruge_stuben_solver(op.a,
+# ml = pyamg.ruge_stuben_solver(op.A,
 #                               max_levels=10,
 #                               max_coarse=5,
 #                               keep=True)
 
-ml = pyamg.smoothed_aggregation_solver(op.a,
+ml = pyamg.smoothed_aggregation_solver(op.A,
                                        max_levels=10,
                                        max_coarse=5,
                                        strength='classical',
@@ -140,7 +140,7 @@ ml = pyamg.smoothed_aggregation_solver(op.a,
 
 M = ml.aspreconditioner(cycle='V')
 res = []
-x, info = pyamg.krylov.cg(op.a, b, maxiter=200, M=M, residuals=res)
+x, info = pyamg.krylov.cg(op.A, b, maxiter=200, M=M, residuals=res)
 # x = ml.solve(b, tol=1e-8, maxiter=200, residuals=res)
 x = x.reshape(f.shape)
 xex = sol(xv[1:-1, 1:-1], yv[1:-1, 1:-1])
@@ -166,6 +166,6 @@ print('Residuals to converge:', len(res))
 # plt.title('Error')
 # plt.colorbar()
 # plt.show()
-plt.spy(op.a - op.a.T)
+plt.spy(op.A - op.A.T)
 plt.show()
 # np.savetxt('nested.txt', res)

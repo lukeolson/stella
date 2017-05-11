@@ -50,9 +50,9 @@ def run(n):
 
     f = met.cJ * rhs(xv[1:-1, 1:-1], yv[1:-1, 1:-1])
     b = f.ravel()
-    ml = pyamg.ruge_stuben_solver(op.a)
+    ml = pyamg.ruge_stuben_solver(op.A)
     M = ml.aspreconditioner(cycle='V')
-    x, info = cg(op.a, b, tol=1e-8, maxiter=100, M=M)
+    x, info = cg(op.A, b, tol=1e-8, maxiter=100, M=M)
     x = x.reshape(f.shape)
     xex = sol(xv[1:-1, 1:-1], yv[1:-1, 1:-1])
 
