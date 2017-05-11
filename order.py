@@ -2,6 +2,9 @@ from test import *
 
 
 def run(n):
+    """
+    run a problem of size n
+    """
     nx = n
     ny = n
 
@@ -22,22 +25,22 @@ def run(n):
     for j in range(ny - 2):
         for i in range(nx - 2):
             sta = StencilArray()
-            sta.N = ((ideta2 * eps[j+1,i+1] * met.J[j+1,i+1] * met.g12[j+1,i+1]) +
-                     (ideta2 * eps[j+1,i+1] * met.J[j+1,i] * met.g21[j+1,i]))
-            sta.S = ((ideta2 * eps[j,i] * met.J[j,i] * met.g12[j,i]) +
-                     (ideta2 * eps[j,i+1] * met.J[j,i+1] * met.g21[j,i+1]))
-            sta.E = (-1*(ideta2 * eps[j+1,i+1] * met.J[j+1,i+1] * met.g12[j+1,i+1]) +
-                     -1*(ideta2 * eps[j,i+1] * met.J[j,i+1] * met.g21[j,i+1]))
-            sta.W = (-1*(ideta2 * eps[j,i] * met.J[j,i] * met.g12[j,i]) +
-                     -1*(ideta2 * eps[j+1,i] * met.J[j+1,i] * met.g21[j+1,i]))
-            sta.NE = ideta2 * eps[j+1,i+1] * met.J[j+1,i+1] * met.g11[j+1,i+1]
-            sta.NW = ideta2 * eps[j+1,i] * met.J[j+1,i] * met.g22[j+1,i]
-            sta.SE = ideta2 * eps[j,i+1] * met.J[j,i+1] * met.g22[j,i+1]
-            sta.SW = ideta2 * eps[j,i] * met.J[j,i] * met.g11[j,i]
-            sta.C = ideta2 * ((-1 * eps[j+1,i+1] * met.J[j+1,i+1] * met.g11[j+1,i+1]) +
-                              (-1 * eps[j,i] * met.J[j,i] * met.g11[j,i]) +
-                              (-1 * eps[j+1,i] * met.J[j+1,i] * met.g22[j+1,i]) +
-                              (-1 * eps[j,i+1] * met.J[j,i+1] * met.g22[j,i+1]))
+            sta.N = ((ideta2 * eps[j+1, i+1] * met.J[j+1, i+1] * met.g12[j+1, i+1]) +
+                     (ideta2 * eps[j+1, i+1] * met.J[j+1, i] * met.g21[j+1, i]))
+            sta.S = ((ideta2 * eps[j, i] * met.J[j, i] * met.g12[j, i]) +
+                     (ideta2 * eps[j, i+1] * met.J[j, i+1] * met.g21[j, i+1]))
+            sta.E = (-1*(ideta2 * eps[j+1, i+1] * met.J[j+1, i+1] * met.g12[j+1, i+1]) +
+                     -1*(ideta2 * eps[j, i+1] * met.J[j, i+1] * met.g21[j, i+1]))
+            sta.W = (-1*(ideta2 * eps[j, i] * met.J[j, i] * met.g12[j, i]) +
+                     -1*(ideta2 * eps[j+1, i] * met.J[j+1, i] * met.g21[j+1, i]))
+            sta.NE = ideta2 * eps[j+1, i+1] * met.J[j+1, i+1] * met.g11[j+1, i+1]
+            sta.NW = ideta2 * eps[j+1, i] * met.J[j+1, i] * met.g22[j+1, i]
+            sta.SE = ideta2 * eps[j, i+1] * met.J[j, i+1] * met.g22[j, i+1]
+            sta.SW = ideta2 * eps[j, i] * met.J[j, i] * met.g11[j, i]
+            sta.C = ideta2 * ((-1 * eps[j+1, i+1] * met.J[j+1, i+1] * met.g11[j+1, i+1]) +
+                              (-1 * eps[j, i] * met.J[j, i] * met.g11[j, i]) +
+                              (-1 * eps[j+1, i] * met.J[j+1, i] * met.g22[j+1, i]) +
+                              (-1 * eps[j, i+1] * met.J[j, i+1] * met.g22[j, i+1]))
 
             sta.vals = -1*sta.vals
 
@@ -45,13 +48,13 @@ def run(n):
 
     op.assemble()
 
-    f = met.cJ * rhs(xv[1:-1,1:-1], yv[1:-1,1:-1])
+    f = met.cJ * rhs(xv[1:-1, 1:-1], yv[1:-1, 1:-1])
     b = f.ravel()
     ml = pyamg.ruge_stuben_solver(op.a)
     M = ml.aspreconditioner(cycle='V')
     x, info = cg(op.a, b, tol=1e-8, maxiter=100, M=M)
     x = x.reshape(f.shape)
-    xex = sol(xv[1:-1,1:-1], yv[1:-1,1:-1])
+    xex = sol(xv[1:-1, 1:-1], yv[1:-1, 1:-1])
 
     diff = xex - x
     return np.max(diff)
@@ -67,6 +70,7 @@ def order():
     np.savetxt('data/h.txt', hs)
     np.savetxt('data/norm.txt', norms)
 
+
 def plot():
     hs = np.loadtxt('data/h.txt')
     norms = np.loadtxt('data/norm.txt')
@@ -78,5 +82,6 @@ def plot():
     plt.show()
 
 
-#order()
-plot()
+if __name__ == '__main__':
+    # order()
+    plot()
