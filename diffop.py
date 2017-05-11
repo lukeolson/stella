@@ -4,6 +4,15 @@ import scipy.sparse
 
 
 class StencilArray(object):
+    """
+    Attributes
+    ----------
+    vals : array
+        3x3 (9x1) array of values for a stencil
+
+    N, S, E, W, NE, NW, SE, SW : float
+        value for each direction of the stencil
+    """
 
     def __init__(self):
         self.vals = np.zeros(9)
@@ -82,16 +91,48 @@ class StencilArray(object):
 
 
 class DiffOp:
+    """
+    Attributes
+    ----------
+    nx, ny : int
+        dimensions of the grid
+
+    A : scipy.sparse.csr_matrix
+        assembled sparse matrix
+
+    Methods
+    -------
+    insert(i, j, stencil_array)
+        insert a stencil array at i, j
+
+    assemble()
+        assemble the CSR sparse matrix
+
+    Examples
+    --------
+    >>> op = DiffOp(nx-2, ny-2)
+    """
 
     def __init__(self, nx, ny):
+        """
+        nx, ny : int
+            grid dimensions
+        """
         self.iv = []
         self.jv = []
         self.dv = []
         self.nx = nx
         self.ny = ny
-        self.a = None
+        self.A = None
 
     def insert(self, i, j, stencil_array):
+        """
+        i, j : int
+            location
+
+        stencil_array : StencilArray
+            stencil
+        """
         nx = self.nx
         ny = self.ny
         sta = stencil_array
@@ -139,12 +180,26 @@ class DiffOp:
                 self.dv.append(sta.W)
 
     def assemble(self):
-        a = sp.sparse.coo_matrix((self.dv, (self.iv, self.jv)),
+        """
+        Assembles a CSR sparse matrix for the stencil
+        """
+        A = sp.sparse.coo_matrix((self.dv, (self.iv, self.jv)),
                                  shape=(self.nx*self.ny, self.nx*self.ny))
-        self.a = a.tocsr()
+        self.A = A.tocsr()
 
 
-def create_op(met, eps):
+def create_op(met):
+    """
+    Parameters
+    ----------
+    met : Metric()
+        metrics for the grid
+
+    Return
+    ------
+    A : scipy.sparse.csr_matrix
+        assembled spares matrix
+    """
     nx = met.x.shape[1]
     ny = met.x.shape[0]
 
