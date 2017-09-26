@@ -21,12 +21,14 @@ template<unsigned int nd>
 struct metrics
 {
 	template<class sten>
-	using stencil_op = cedar::cdr2::mpi::stencil_op<sten>;
+	using stencil_op = typename std::conditional<nd == 2,
+		cedar::cdr2::mpi::stencil_op<sten>,
+		cedar::cdr3::mpi::stencil_op<sten>>::type;
 
-metrics(cedar::topo_ptr topo): coeff(topo), J(topo), g12(topo) {}
+metrics(cedar::topo_ptr topo): coeff(topo), J(topo), g12(topo), g13(topo), g23(topo) {}
 
 	stencil_op<metric_stencil<nd>> coeff;
-	grid_func<2> J, g12;
+	grid_func<nd> J, g12, g13, g23;
 };
 
 template<unsigned int nd>

@@ -21,7 +21,7 @@ namespace stella
 		using real_t = cedar::real_t;
 		using len_t = cedar::len_t;
 	public:
-	grid(std::array<len_t, nd> len): grid_topo(std::make_shared<std::vector<len_t>>(NBMG_pIGRD),0,1)
+	grid(std::array<len_t, nd> len): grid_topo(std::make_shared<std::vector<len_t>>(NBMG_pIGRD),0,1), active(true)
 		{
 			for (len_t i = 0; i < nd; i++) {
 				nlocal(i) = len[i] + 2;
@@ -34,6 +34,10 @@ namespace stella
 		}
 		cedar::array<real_t, nd> & vertex(int dim) { return verts[dim]; }
 		const cedar::array<real_t, nd> & vertex(int dim) const { return verts[dim]; }
+
+		std::array<cedar::array<real_t, nd>, nd> & get_vertex() { return verts; }
+		const std::array<cedar::array<real_t, nd>, nd> & get_vertex() const { return verts; }
+
 		len_t ie(int dim) const
 		{
 			return is(dim) + (nlocal(dim) - 2) - 1;
@@ -122,12 +126,16 @@ namespace stella
 			return ref;
 		}
 
+		bool is_active() { return active; }
+		void set_active(bool isactive) { active = isactive; }
+
 
 	protected:
 		std::array<cedar::array<real_t, nd>, nd> verts;
 		std::unique_ptr<stella::metrics<nd>> met;
 		std::shared_ptr<halo_exchanger> halof;
 		std::shared_ptr<cedar::grid_topo> ref;
+		bool active;
 	};
 
 	void apply_func(grid_func<2> & gf, const grid<2> & sgrid,
