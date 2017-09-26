@@ -75,13 +75,18 @@ namespace stella
 			if (halof == nullptr) {
 				cedar::config::reader conf("config.json");
 				auto params = cedar::build_kernel_params(conf);
-				halof = std::make_unique<cedar::halo_exchanger<nd>>(*params, *this);
+				halof = std::make_shared<cedar::halo_exchanger<nd>>(*params, *this);
 			}
 		}
 
 		halo_exchanger & get_halo_exchanger()
 		{
 			return *halof;
+		}
+
+		void set_halo_exchanger(std::shared_ptr<cedar::halo_exchanger<nd>> ptr)
+		{
+			halof = ptr;
 		}
 
 		template<class T>
@@ -121,9 +126,12 @@ namespace stella
 	protected:
 		std::array<cedar::array<real_t, nd>, nd> verts;
 		std::unique_ptr<stella::metrics<nd>> met;
-		std::unique_ptr<halo_exchanger> halof;
+		std::shared_ptr<halo_exchanger> halof;
 		std::shared_ptr<cedar::grid_topo> ref;
 	};
+
+	void apply_func(grid_func<2> & gf, const grid<2> & sgrid,
+	                std::function<cedar::real_t(cedar::real_t x, cedar::real_t y)> func);
 }
 
 #endif
