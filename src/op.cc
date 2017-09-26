@@ -83,4 +83,44 @@ void apply_interior<2>(op<2> & sop, const grid<2> & sgrid)
 	}
 }
 
+
+template<>
+void apply_interior<3>(op<3> & sop, const grid<3> & sgrid)
+{
+	using namespace cedar;
+	using namespace cedar::cdr3;
+
+	auto & met = sgrid.metrics().coeff;
+	auto & coeff = sop.get_coefficients();
+	int beg[3], end[3];
+	for (int axis = 0; axis < 3; axis++) {
+		beg[axis] = sgrid.ibase(axis);
+		end[axis] = sgrid.ibound(axis);
+	}
+
+	for (len_t k = beg[2]; k < end[2]; k++) {
+		for (len_t j = beg[1]; j < end[1]; j++) {
+			for (len_t i = beg[0]; i < end[0] + 1; i++) {
+				coeff(i,j,k,xxvii_pt::pw) = met(i,j,k,met3::w);
+			}
+		}
+	}
+
+	for (len_t k = beg[2]; k < end[2]; k++) {
+		for (len_t j = beg[1]; j < end[1] + 1; j++) {
+			for (len_t i = beg[0]; i < end[0]; i++) {
+				coeff(i,j,k,xxvii_pt::ps) = met(i,j,k,met3::s);
+			}
+		}
+	}
+
+	for (len_t k = beg[2]; k < end[2] + 1; k++) {
+		for (len_t j = beg[1]; j < end[1]; j++) {
+			for (len_t i = beg[0]; i < end[0]; i++) {
+				coeff(i,j,k,xxvii_pt::b) = met(i,j,k,met3::b);
+			}
+		}
+	}
+}
+
 }
