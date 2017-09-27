@@ -79,7 +79,7 @@ namespace stella
 			if (halof == nullptr) {
 				cedar::config::reader conf("config.json");
 				auto params = cedar::build_kernel_params(conf);
-				halof = std::make_shared<cedar::halo_exchanger<nd>>(*params, *this);
+				halof = std::make_shared<halo_exchanger>(*params, *this);
 			}
 		}
 
@@ -88,7 +88,7 @@ namespace stella
 			return *halof;
 		}
 
-		void set_halo_exchanger(std::shared_ptr<cedar::halo_exchanger<nd>> ptr)
+		void set_halo_exchanger(std::shared_ptr<halo_exchanger> ptr)
 		{
 			halof = ptr;
 		}

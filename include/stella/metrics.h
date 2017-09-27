@@ -8,7 +8,7 @@
 namespace stella
 {
 
-	template<unsigned int nd, class halo_exchanger=cedar::halo_exchanger<2>>
+	template<unsigned int nd, class halo_exchanger=cedar::halo_exchanger<nd>>
 	class grid;
 
 enum class met2 {c=0, w, s, sw, se, ndirs};
