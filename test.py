@@ -1,10 +1,14 @@
+import matplotlib as mpl
+mpl.use('Qt4Agg')
+
+
 import numpy as np
 import scipy as sp
 import scipy.sparse
 import matplotlib.pyplot as plt
 from scipy.sparse.linalg import cg
 import pyamg
-from diffop import create_op, DiffOp, StencilArray
+from diffop import create_op, DiffOp, StencilArray, CSRMat
 from metric import Metric
 import matplotlib.gridspec as gridspec
 from mpl_toolkits.mplot3d.axes3d import Axes3D
@@ -109,8 +113,8 @@ def jump_sol(x, y):
     return ret
 
 
-nx = 101
-ny = 101
+nx = 51
+ny = 51
 
 x = np.linspace(0, 1, nx)
 y = np.linspace(0, 1, ny)
@@ -123,7 +127,7 @@ xv = xtmp
 met = Metric(xv, yv)
 eps = np.ones((ny-1, nx-1))
 
-op = create_op(met)
+op = create_op(met, CSRMat)
 
 f = met.cJ[1:-1, 1:-1] * rhs(xv[1:-1, 1:-1], yv[1:-1, 1:-1])
 b = f.ravel()
@@ -152,9 +156,9 @@ print('Residuals to converge:', len(res))
 # plt.show()
 # plt.pcolormesh(yv)
 
-# plt.show()
 # plt.subplot(221)
-# plt.pcolormesh(x)
+plt.pcolormesh(x)
+plt.show()
 # plt.title('Computed Solution')
 # plt.colorbar()
 # plt.subplot(222)
@@ -166,6 +170,6 @@ print('Residuals to converge:', len(res))
 # plt.title('Error')
 # plt.colorbar()
 # plt.show()
-plt.spy(op.A - op.A.T)
-plt.show()
+# plt.spy(op.A - op.A.T)
+# plt.show()
 # np.savetxt('nested.txt', res)

@@ -90,7 +90,52 @@ class StencilArray(object):
         self.vals[8] = val
 
 
-class DiffOp:
+class DiffOp(object):
+    """
+    Attributes
+    ----------
+    nx, ny : int
+        dimensions of the grid
+
+    A : sparse matrix
+
+    Methods
+    -------
+    insert(i, j, stencil_array)
+        insert a stencil array at i, j
+
+    assemble()
+        assemble the sparse matrix (if needed)
+
+    Examples
+    --------
+    >>> op = DiffOp(nx-2, ny-2)
+    """
+
+    def __init__(self, nx, ny):
+        """
+        nx, ny : int
+            grid dimensions (without ghosts)
+        """
+        self.nx = nx
+        self.ny = ny
+        self.A = None
+
+    def insert(self, i, j, stencil_array):
+        """
+        i, j : int
+            location
+
+        stencil_array : StencilArray
+            stencil
+        """
+        pass
+
+    def assemble(self):
+        pass
+
+
+class CSRMat(DiffOp):
     """
     Attributes
     ----------
@@ -118,12 +163,11 @@ class DiffOp:
         nx, ny : int
             grid dimensions
         """
+        super(CSRMat, self).__init__(nx, ny)
         self.iv = []
         self.jv = []
         self.dv = []
-        self.nx = nx
-        self.ny = ny
-        self.A = None
+
 
     def insert(self, i, j, stencil_array):
         """
@@ -188,27 +232,37 @@ class DiffOp:
         self.A = A.tocsr()
 
 
-def create_op(met):
+def create_op(met, opclass):
     """
     Parameters
     ----------
     met : Metric()
         metrics for the grid
+    opclass: type for the discrete operator, should inherit from DiffOp
 
     Return
     ------
-    A : scipy.sparse.csr_matrix
-        assembled spares matrix
+    op : the assembled sparse matrix
     """
     nx = met.x.shape[1]
     ny = met.x.shape[0]
 
     deta = 2. / (np.sqrt(2))
     ideta2 = 1. / (deta**2)
-    op = DiffOp(nx-2, ny-2)
-    for j in range(ny - 2):
+    op = opclass(nx, ny)
+    for j in range(ny):
+        sta = StencilArray()
+        sta.C = 1.0
+        op.insert(0, j, sta)
+        op.insert(nx-1,j, sta)
+    for i in range(nx):
+        sta = StencilArray()
+        sta.C = 1.0
+        op.insert(i, 0, sta)
+        op.insert(i, ny-1, sta)
+    for j in range(1,ny - 2):
         jj = j+1
-        for i in range(nx - 2):
+        for i in range(1,nx - 2):
             ii = i+1
             sta = StencilArray()
             sta.N = met.yhJ[j+1, i] * met.g22[j+1, i]
