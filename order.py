@@ -2,7 +2,7 @@ from test import *
 from diffop import *
 
 
-def run(n):
+def run(n, mapx, mapy):
     """
     run a problem of size n
     """
@@ -12,6 +12,10 @@ def run(n):
     x = np.linspace(0, 1, nx)
     y = np.linspace(0, 1, ny)
     xv, yv = np.meshgrid(x, y)
+
+    xtmp = mapx(xv, yv)
+    yv = mapy(xv, yv)
+    xv = xtmp
 
     met = Metric(xv, yv)
 
@@ -42,7 +46,7 @@ def order():
     ns = [51, 101, 201]
     norms = []
     for n in ns:
-        nrm = run(n)
+        nrm = run(n, map_distort_x, map_distort_y)
         norms.append(nrm)
     hs = [1./n for n in ns]
     np.savetxt('data/h.txt', hs)
@@ -52,8 +56,12 @@ def order():
 def plot():
     hs = np.loadtxt('data/h.txt')
     norms = np.loadtxt('data/norm.txt')
+
+    ordr = np.log(norms[1:] / norms[:-1]) / np.log(hs[1:] / hs[:-1])
+    print('order: ', ordr)
     plt.loglog(hs, norms, '-o', label=r'Computed')
     plt.loglog(hs, hs**2, label=r'$O(h^2)$')
+    plt.loglog(hs, hs, label=r'$O(h)$')
     plt.xlabel(r'$h$')
     plt.ylabel(r'$ || e ||_{\infty} $')
     plt.legend(loc=0)

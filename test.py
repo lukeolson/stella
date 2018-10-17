@@ -78,12 +78,12 @@ def map_second_y(x, y):
 
 
 def map_distort_x(x, y):
-    eps = .01
+    eps = .1
     return x + eps*np.sin(2*np.pi*x)*np.sin(2*np.pi*y)
 
 
 def map_distort_y(x, y):
-    eps = .01
+    eps = .1
     return y + eps*np.sin(2*np.pi*x)*np.sin(2*np.pi*y)
 
 
@@ -109,63 +109,64 @@ def jump_sol(x, y):
     return ret
 
 
-nx = 101
-ny = 101
+if False:
+    nx = 101
+    ny = 101
 
-x = np.linspace(0, 1, nx)
-y = np.linspace(0, 1, ny)
-xv, yv = np.meshgrid(x, y)
+    x = np.linspace(0, 1, nx)
+    y = np.linspace(0, 1, ny)
+    xv, yv = np.meshgrid(x, y)
 
-xtmp = map_distort_x(xv, yv)
-yv = map_distort_y(xv, yv)
-xv = xtmp
+    xtmp = map_distort_x(xv, yv)
+    yv = map_distort_y(xv, yv)
+    xv = xtmp
 
-met = Metric(xv, yv)
-eps = np.ones((ny-1, nx-1))
+    met = Metric(xv, yv)
+    eps = np.ones((ny-1, nx-1))
 
-op = create_op(met)
+    op = create_op(met)
 
-f = met.cJ[1:-1, 1:-1] * rhs(xv[1:-1, 1:-1], yv[1:-1, 1:-1])
-b = f.ravel()
-# ml = pyamg.ruge_stuben_solver(op.A,
-#                               max_levels=10,
-#                               max_coarse=5,
-#                               keep=True)
+    f = met.cJ[1:-1, 1:-1] * rhs(xv[1:-1, 1:-1], yv[1:-1, 1:-1])
+    b = f.ravel()
+    # ml = pyamg.ruge_stuben_solver(op.A,
+    #                               max_levels=10,
+    #                               max_coarse=5,
+    #                               keep=True)
 
-ml = pyamg.smoothed_aggregation_solver(op.A,
-                                       max_levels=10,
-                                       max_coarse=5,
-                                       strength='classical',
-                                       keep=True)
+    ml = pyamg.smoothed_aggregation_solver(op.A,
+                                           max_levels=10,
+                                           max_coarse=5,
+                                           strength='classical',
+                                           keep=True)
 
-M = ml.aspreconditioner(cycle='V')
-res = []
-x, info = pyamg.krylov.cg(op.A, b, maxiter=200, M=M, residuals=res)
-# x = ml.solve(b, tol=1e-8, maxiter=200, residuals=res)
-x = x.reshape(f.shape)
-xex = sol(xv[1:-1, 1:-1], yv[1:-1, 1:-1])
+    M = ml.aspreconditioner(cycle='V')
+    res = []
+    x, info = pyamg.krylov.cg(op.A, b, maxiter=200, M=M, residuals=res)
+    # x = ml.solve(b, tol=1e-8, maxiter=200, residuals=res)
+    x = x.reshape(f.shape)
+    xex = sol(xv[1:-1, 1:-1], yv[1:-1, 1:-1])
 
-diff = xex - x
-print('Max Norm:', np.max(np.abs(diff)))
-print('Residuals to converge:', len(res))
-# plt.pcolormesh(xv)
-# plt.show()
-# plt.pcolormesh(yv)
+    diff = xex - x
+    print('Max Norm:', np.max(np.abs(diff)))
+    print('Residuals to converge:', len(res))
+    # plt.pcolormesh(xv)
+    # plt.show()
+    # plt.pcolormesh(yv)
 
-# plt.show()
-# plt.subplot(221)
-# plt.pcolormesh(x)
-# plt.title('Computed Solution')
-# plt.colorbar()
-# plt.subplot(222)
-# plt.pcolormesh(xex)
-# plt.title('Exact Solution')
-# plt.colorbar()
-# plt.subplot(223)
-# plt.pcolormesh(diff)
-# plt.title('Error')
-# plt.colorbar()
-# plt.show()
-plt.spy(op.A - op.A.T)
-plt.show()
-# np.savetxt('nested.txt', res)
+    # plt.show()
+    # plt.subplot(221)
+    # plt.pcolormesh(x)
+    # plt.title('Computed Solution')
+    # plt.colorbar()
+    # plt.subplot(222)
+    # plt.pcolormesh(xex)
+    # plt.title('Exact Solution')
+    # plt.colorbar()
+    # plt.subplot(223)
+    # plt.pcolormesh(diff)
+    # plt.title('Error')
+    # plt.colorbar()
+    # plt.show()
+    plt.spy(op.A - op.A.T)
+    plt.show()
+    # np.savetxt('nested.txt', res)
